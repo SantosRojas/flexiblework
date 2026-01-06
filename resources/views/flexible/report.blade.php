@@ -20,6 +20,11 @@
                 @php
                     $prevMonth = Carbon\Carbon::create($year, $month, 1)->subMonth();
                     $nextMonth = Carbon\Carbon::create($year, $month, 1)->addMonth();
+                    
+                    // Calcular estadísticas dinámicas
+                    $uniqueSchedules = $byTime->count();
+                    $earliestTime = $assignments->min('start_time');
+                    $latestTime = $assignments->max('start_time');
                 @endphp
                 <a href="{{ route('flexible-schedule.report', ['month' => $prevMonth->month, 'year' => $prevMonth->year]) }}"
                     class="inline-flex items-center px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-300">
@@ -40,142 +45,98 @@
                     <div class="text-3xl font-bold text-blue-600 dark:text-blue-400">
                         {{ $assignments->count() }}
                     </div>
-                    <div class="text-gray-600 dark:text-gray-400">Total asignaciones</div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="text-3xl font-bold text-green-600 dark:text-green-400">
-                        {{ $byTime->has('08:00:00') ? $byTime['08:00:00']->count() : 0 }}
-                    </div>
-                    <div class="text-gray-600 dark:text-gray-400">Entrada 08:00</div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
-                    <div class="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
-                        {{ $byTime->has('08:30:00') ? $byTime['08:30:00']->count() : 0 }}
-                    </div>
-                    <div class="text-gray-600 dark:text-gray-400">Entrada 08:30</div>
+                    <div class="text-gray-600 dark:text-gray-400">Total empleados con horario flexible</div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <div class="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                        {{ $byTime->has('09:00:00') ? $byTime['09:00:00']->count() : 0 }}
+                        {{ $uniqueSchedules }}
                     </div>
-                    <div class="text-gray-600 dark:text-gray-400">Entrada 09:00</div>
+                    <div class="text-gray-600 dark:text-gray-400">Horarios diferentes utilizados</div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="text-3xl font-bold text-green-600 dark:text-green-400">
+                        {{ $earliestTime ? substr($earliestTime, 0, 5) : '--:--' }}
+                    </div>
+                    <div class="text-gray-600 dark:text-gray-400">Entrada más temprana</div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                        {{ $latestTime ? substr($latestTime, 0, 5) : '--:--' }}
+                    </div>
+                    <div class="text-gray-600 dark:text-gray-400">Entrada más tardía</div>
                 </div>
             </div>
 
-            {{-- Distribución por horario --}}
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
+
+            {{-- Lista detallada de empleados --}}
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Distribución por Horario
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+                        Listado Completo de Empleados
                     </h3>
 
                     @if($assignments->isEmpty())
-                        <p class="text-gray-500 dark:text-gray-400">No hay asignaciones para este mes.</p>
-                    @else
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            @foreach(['08:00:00' => '08:00', '08:30:00' => '08:30', '09:00:00' => '09:00'] as $timeKey => $timeLabel)
-                                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                                    <h4 class="text-lg font-semibold mb-3 
-                                                {{ $timeLabel == '08:00' ? 'text-green-600 dark:text-green-400' : '' }}
-                                                {{ $timeLabel == '08:30' ? 'text-yellow-600 dark:text-yellow-400' : '' }}
-                                                {{ $timeLabel == '09:00' ? 'text-blue-600 dark:text-blue-400' : '' }}">
-                                        🕐 Entrada {{ $timeLabel }}
-                                    </h4>
-
-                                    @if($byTime->has($timeKey))
-                                        <div class="space-y-2">
-                                            @foreach($byTime[$timeKey] as $assignment)
-                                                <div class="flex justify-between items-center text-sm">
-                                                    <span class="text-gray-700 dark:text-gray-300">{{ $assignment->user->name }}</span>
-                                                    <span
-                                                        class="text-gray-500 dark:text-gray-400 text-xs">{{ $assignment->user->work_area }}</span>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <p class="text-gray-400 text-sm">Sin asignaciones</p>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            {{-- Distribución por área --}}
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Distribución por Área</h3>
-
-                    @if($byArea->isEmpty())
                         <p class="text-gray-500 dark:text-gray-400">No hay asignaciones para este mes.</p>
                     @else
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                 <thead class="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Empleado
+                                        </th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                             Área
                                         </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Total
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Hora de Entrada
                                         </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            08:00
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Hora de Salida
                                         </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            08:30
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            09:00
-                                        </th>
-                                        <th
-                                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                            Empleados
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                            Asignado por
                                         </th>
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    @foreach($byArea as $area => $areaAssignments)
-                                        <tr>
-                                            <td
-                                                class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                {{ $area }}
+                                    @foreach($assignments->sortBy('user.name') as $assignment)
+                                        @php
+                                            $dailyWorkMinutes = App\Models\SystemSetting::getInt('daily_work_minutes', 480);
+                                            $lunchMinutes = 60; // 1 hora de almuerzo
+                                            $totalMinutes = $dailyWorkMinutes + $lunchMinutes;
+                                            
+                                            $startTime = Carbon\Carbon::createFromTimeString($assignment->start_time);
+                                            $endTime = $startTime->copy()->addMinutes($totalMinutes);
+                                            
+                                            // Calcular horas de trabajo para mostrar
+                                            $workHours = floor($dailyWorkMinutes / 60);
+                                            $workMins = $dailyWorkMinutes % 60;
+                                        @endphp
+                                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                    {{ $assignment->user->name }} {{ $assignment->user->last_name }}
+                                                </div>
+                                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                                    {{ $assignment->user->email }}
+                                                </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
-                                                    {{ $areaAssignments->count() }}
+                                                {{ $assignment->user->work_area }}
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full text-sm font-semibold">
+                                                    {{ substr($assignment->start_time, 0, 5) }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <span class="px-3 py-1 bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 rounded-full text-sm font-semibold">
+                                                    {{ $endTime->format('H:i') }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                <span
-                                                    class="px-2 py-1 bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 rounded-full">
-                                                    {{ $areaAssignments->filter(fn($a) => $a->start_time == '08:00:00')->count() }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                <span
-                                                    class="px-2 py-1 bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100 rounded-full">
-                                                    {{ $areaAssignments->filter(fn($a) => $a->start_time == '08:30:00')->count() }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                <span
-                                                    class="px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 rounded-full">
-                                                    {{ $areaAssignments->filter(fn($a) => $a->start_time == '09:00:00')->count() }}
-                                                </span>
-                                            </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                                @foreach($areaAssignments as $assignment)
-                                                    <span
-                                                        class="inline-block bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs mr-1 mb-1">
-                                                        {{ $assignment->user->name }}
-                                                    </span>
-                                                @endforeach
+                                                {{ $assignment->assignedBy->name ?? 'Sistema' }}
                                             </td>
                                         </tr>
                                     @endforeach
