@@ -75,13 +75,8 @@
                             {{-- Información de horarios disponibles --}}
                             <div class="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
                                 <p class="text-sm text-blue-800 dark:text-blue-200">
-                                    <span class="font-semibold"> Horarios de ingreso disponibles:</span>
+                                    <span class="font-semibold">ℹ️ Horarios permitidos:</span> Entre 07:00 y 11:59 AM
                                 </p>
-                                <div class="mt-2 flex flex-wrap gap-2">
-                                    @foreach($allowedTimes as $time)
-                                        <span class="inline-block bg-blue-200 dark:bg-blue-700 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm font-medium">{{ $time }}</span>
-                                    @endforeach
-                                </div>
                             </div>
 
                             <form action="{{ route('flexible-schedule.store') }}" method="POST" class="space-y-4">
@@ -115,12 +110,33 @@
 
                                 <div>
                                     <x-input-label for="start_time" value="Horario de Entrada" />
-                                    <select name="start_time" id="start_time" required
-                                            class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    
+                                    {{-- Botones de horarios rápidos --}}
+                                    <div class="mt-2 flex flex-wrap gap-2 mb-3">
                                         @foreach($allowedTimes as $time)
-                                            <option value="{{ $time }}">{{ $time }}</option>
+                                            <button type="button" 
+                                                    onclick="document.getElementById('start_time').value = '{{ $time }}'"
+                                                    class="px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
+                                                        {{ $time == '08:00' ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-600 dark:bg-green-900 dark:text-green-300' : '' }}
+                                                        {{ $time == '08:30' ? 'border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
+                                                        {{ $time == '09:00' ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300' : '' }}">
+                                                {{ $time }}
+                                            </button>
                                         @endforeach
-                                    </select>
+                                    </div>
+
+                                    {{-- Campo de texto para horario personalizado --}}
+                                    <input type="time" 
+                                           name="start_time" 
+                                           id="start_time" 
+                                           required
+                                           min="07:00"
+                                           max="11:59"
+                                           value="08:00"
+                                           class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                        Selecciona un horario predefinido o ingresa uno personalizado (07:00 - 11:59 AM)
+                                    </p>
                                 </div>
 
                                 <div class="pt-4">
@@ -144,13 +160,17 @@
                                 </h3>
                                 <div class="space-y-2">
                                     @foreach($assignments->sortBy('start_time') as $assignment)
+                                        @php
+                                            $assignmentTime = substr($assignment->start_time, 0, 5);
+                                        @endphp
                                         <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                             <div class="flex items-center space-x-3">
                                                 <span class="px-3 py-1 rounded-full text-sm font-semibold
-                                                    {{ substr($assignment->start_time, 0, 5) == '08:00' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : '' }}
-                                                    {{ substr($assignment->start_time, 0, 5) == '08:30' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' : '' }}
-                                                    {{ substr($assignment->start_time, 0, 5) == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}">
-                                                    {{ substr($assignment->start_time, 0, 5) }}
+                                                    {{ $assignmentTime == '08:00' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : '' }}
+                                                    {{ $assignmentTime == '08:30' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' : '' }}
+                                                    {{ $assignmentTime == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}
+                                                    {{ !in_array($assignmentTime, ['08:00', '08:30', '09:00']) ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100' : '' }}">
+                                                    {{ $assignmentTime }}
                                                 </span>
                                                 <div>
                                                     <span class="font-medium text-gray-800 dark:text-gray-200">{{ $assignment->user->name }}</span>
@@ -163,7 +183,7 @@
                                                 <div class="flex items-center space-x-2">
                                                     {{-- Botón editar --}}
                                                     <button type="button" 
-                                                            onclick="openEditModal({{ $assignment->id }}, '{{ substr($assignment->start_time, 0, 5) }}')"
+                                                            onclick="openEditModal({{ $assignment->id }}, '{{ $assignmentTime }}')"
                                                             class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -190,19 +210,21 @@
                                 {{-- Resumen por horario --}}
                                 <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
                                     <p class="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Resumen:</p>
+                                    @php
+                                        // Agrupar por horario y contar
+                                        $groupedByTime = $assignments->groupBy(fn($a) => substr($a->start_time, 0, 5))->sortKeys();
+                                    @endphp
                                     <div class="flex flex-wrap gap-4">
-                                        @foreach($allowedTimes as $time)
-                                            @php
-                                                $countForTime = $assignments->filter(fn($a) => substr($a->start_time, 0, 5) === $time)->count();
-                                            @endphp
+                                        @foreach($groupedByTime as $time => $assignmentsForTime)
                                             <div class="flex items-center space-x-2">
                                                 <span class="px-2 py-1 rounded text-xs font-semibold
                                                     {{ $time == '08:00' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : '' }}
                                                     {{ $time == '08:30' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' : '' }}
-                                                    {{ $time == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}">
+                                                    {{ $time == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}
+                                                    {{ !in_array($time, ['08:00', '08:30', '09:00']) ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100' : '' }}">
                                                     {{ $time }}
                                                 </span>
-                                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ $countForTime }} persona(s)</span>
+                                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ $assignmentsForTime->count() }} persona(s)</span>
                                             </div>
                                         @endforeach
                                     </div>
@@ -271,12 +293,28 @@
                     
                     <div class="mb-4">
                         <x-input-label for="edit_start_time" value="Nuevo Horario de Entrada" />
-                        <select name="start_time" id="edit_start_time" required
-                                class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                        
+                        {{-- Botones de horarios rápidos --}}
+                        <div class="mt-2 flex flex-wrap gap-2 mb-3">
                             @foreach($allowedTimes as $time)
-                                <option value="{{ $time }}">{{ $time }}</option>
+                                <button type="button" 
+                                        onclick="document.getElementById('edit_start_time').value = '{{ $time }}'"
+                                        class="px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all
+                                            {{ $time == '08:00' ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-600 dark:bg-green-900 dark:text-green-300' : '' }}
+                                            {{ $time == '08:30' ? 'border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
+                                            {{ $time == '09:00' ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300' : '' }}">
+                                    {{ $time }}
+                                </button>
                             @endforeach
-                        </select>
+                        </div>
+
+                        <input type="time" 
+                               name="start_time" 
+                               id="edit_start_time" 
+                               required
+                               min="07:00"
+                               max="10:59"
+                               class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                     </div>
                     
                     <div class="flex justify-end space-x-2">

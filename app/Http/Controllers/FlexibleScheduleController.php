@@ -92,7 +92,9 @@ class FlexibleScheduleController extends Controller
             'user_id' => 'required|exists:users,id',
             'month' => 'required|integer|between:1,12',
             'year' => 'required|integer|min:2024',
-            'start_time' => 'required|in:08:00,08:30,09:00',
+            'start_time' => ['required', 'regex:/^(0[7-9]|1[0-1]):[0-5][0-9]$/'],
+        ], [
+            'start_time.regex' => 'El horario debe estar entre 07:00 y 11:59 AM en formato HH:MM',
         ]);
         
         $targetUser = User::findOrFail($request->user_id);
@@ -150,7 +152,9 @@ class FlexibleScheduleController extends Controller
         $user = Auth::user();
         
         $request->validate([
-            'start_time' => 'required|in:08:00,08:30,09:00',
+            'start_time' => ['required', 'regex:/^(0[7-9]|1[0-1]):[0-5][0-9]$/'],
+        ], [
+            'start_time.regex' => 'El horario debe estar entre 07:00 y 11:59 AM en formato HH:MM',
         ]);
         
         $month = $flexibleSchedule->month;

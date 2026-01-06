@@ -14,53 +14,44 @@ class UsersSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'Santos Rojas',
-            'email' => 'rojas@example.com',
-            'password' => bcrypt('santos123'),
-            'role' => 'admin',
+            'name' => 'Jose Perez',
+            'email' => 'jose.perez@example.com',
+            'password' => bcrypt('jose123'),
+            'role' => 'user',
             'work_area' => 'IT',
 
         ]);
         User::create([
-            'name' => 'Maria Gomez',
-            'email' => 'maria@mail.com',
-            'password' => bcrypt('maria123'),
-            'role' => 'manager',
+            'name' => 'Mario Gomez',
+            'email' => 'mario.gomez@example.com',
+            'password' => bcrypt('mario123'),
+            'role' => 'user',
             'work_area' => 'HR'
         ]);
 
         User::create([
-            'name' => 'Luis Fernandez',
-            'email' => 'luis@mail.com',
+            'name' => 'Luis Guzman',
+            'email' => 'luis.guzman@example.com',
             'password' => bcrypt('luis123'),
             'role' => 'user',
             'work_area' => 'HR'
         ]);
 
         User::create([
-            'name' => 'Ana Martinez',
-            'email' => 'ana@mail.com',
-            'password' => bcrypt('ana123'),
+            'name' => 'Rosa Martinez',
+            'email' => 'rosa.martinez@example.com',
+            'password' => bcrypt('rosa123'),
             'role' => 'user',
             'work_area' => 'Finance'
         ]);
 
         User::create([
-            'name' => 'Carlos Lopez',
-            'email' => 'carlos@mail.com',
-            'password' => bcrypt('carlos123'),
+            'name' => 'Miguel Lopez',
+            'email' => 'miguel.lopez@example.com',
+            'password' => bcrypt('miguel123'),
             'role' => 'user',
             'work_area' => 'HR'
         ]);
-
-        User::create([
-            'name' => 'Sofia Ramirez',
-            'email' => 'sofia@mail.com',
-            'password' => bcrypt('sofia123'),
-            'role' => 'manager',
-            'work_area' => 'Finance'
-        ]);
-
 
     }
 }
