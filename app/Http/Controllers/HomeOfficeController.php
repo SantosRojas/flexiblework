@@ -33,13 +33,20 @@ class HomeOfficeController extends Controller
             ->orderBy('date')
             ->get();
         
-        // Si es manager o admin, obtener usuarios de su área
+        // Si es manager o admin, obtener usuarios (incluyéndose a sí mismo)
         $teamMembers = collect();
         if ($user->canManageAssignments()) {
-            $teamMembers = User::where('work_area', $user->work_area)
-                ->where('id', '!=', $user->id)
-                ->orderBy('name')
-                ->get();
+            if ($user->isAdmin()) {
+                // Admin puede ver todos los usuarios incluyéndose
+                $teamMembers = User::orderBy('work_area')
+                    ->orderBy('name')
+                    ->get();
+            } else {
+                // Manager ve usuarios de su área incluyéndose
+                $teamMembers = User::where('work_area', $user->work_area)
+                    ->orderBy('name')
+                    ->get();
+            }
         }
         
         // Generar días del mes con información

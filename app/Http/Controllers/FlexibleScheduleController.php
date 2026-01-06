@@ -43,14 +43,22 @@ class FlexibleScheduleController extends Controller
         
         $assignments = $query->orderBy('start_time')->get();
         
-        // Si es manager o admin, obtener usuarios elegibles de su área
+// Si es manager o admin, obtener usuarios elegibles (incluyéndose a sí mismo)
         $teamMembers = collect();
         if ($user->canManageAssignments()) {
-            $teamMembers = User::where('work_area', $user->work_area)
-                ->whereNotIn('work_area', self::RESTRICTED_AREAS)
-                ->where('id', '!=', $user->id)
-                ->orderBy('name')
-                ->get();
+            if ($user->isAdmin()) {
+                // Admin puede ver todos los usuarios de áreas permitidas
+                $teamMembers = User::whereNotIn('work_area', self::RESTRICTED_AREAS)
+                    ->orderBy('work_area')
+                    ->orderBy('name')
+                    ->get();
+            } else {
+                // Manager ve usuarios de su área incluyéndose
+                $teamMembers = User::where('work_area', $user->work_area)
+                    ->whereNotIn('work_area', self::RESTRICTED_AREAS)
+                    ->orderBy('name')
+                    ->get();
+            }
         }
         
         // Horarios permitidos
