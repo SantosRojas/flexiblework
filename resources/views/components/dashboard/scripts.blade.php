@@ -24,7 +24,7 @@
                 <div class="flex items-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg">
                     <div class="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
                     <div>
-                        <p class="font-medium text-gray-800 dark:text-gray-200">${a.name}</p>
+                        <p class="font-medium text-gray-800 dark:text-gray-200">${a.name + ' ' + a.last_name}</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400">${a.area}</p>
                     </div>
                 </div>

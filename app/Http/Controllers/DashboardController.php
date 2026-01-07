@@ -79,7 +79,11 @@ class DashboardController extends Controller
             return $a->date->format('Y-m-d');
         })->map(function($items) {
             return $items->map(function($a) {
-                return ['name' => $a->user->name, 'area' => $a->user->work_area];
+                return [
+                    'name' => $a->user->name,
+                    'last_name' => $a->user->last_name,
+                    'area' => $a->user->work_area
+                ];
             })->values();
         });
 
