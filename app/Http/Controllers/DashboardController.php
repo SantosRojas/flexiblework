@@ -94,7 +94,7 @@ class DashboardController extends Controller
                 return $a->user->work_area;
             })->map(function($items) {
                 return $items->map(function($a) {
-                    return ['name' => $a->user->name, 'time' => substr($a->start_time, 0, 5)];
+                    return ['name' => $a->user->name,'last_name' => $a->user->last_name, 'time' => substr($a->start_time, 0, 5)];
                 })->sortBy('time')->values();
             });
         }

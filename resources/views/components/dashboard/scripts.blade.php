@@ -61,7 +61,7 @@
                     <div class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
                         <div class="flex items-center">
                             <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
-                            <p class="font-medium text-gray-800 dark:text-gray-200">${a.name}</p>
+                            <p class="font-medium text-gray-800 dark:text-gray-200">${a.name + ' ' + a.last_name}</p>
                         </div>
                         <span class="px-2 py-1 rounded text-xs font-semibold ${colorClass}">${a.time}</span>
                     </div>
