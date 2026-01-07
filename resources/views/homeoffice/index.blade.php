@@ -82,7 +82,7 @@
                                         <option value="">Seleccionar empleado...</option>
                                         @foreach($teamMembers as $member)
                                             <option value="{{ $member->id }}">
-                                                {{ $member->name }}
+                                                {{ strtok($member->name, ' ').' '.strtok($member->last_name, ' ') }}
                                                 @if(Auth::user()->isAdmin())
                                                     [{{ $member->work_area }}]
                                                 @endif

@@ -96,7 +96,7 @@
                                                 $hasAssignment = $assignments->where('user_id', $member->id)->first();
                                             @endphp
                                             <option value="{{ $member->id }}" {{ $hasAssignment ? 'disabled' : '' }}>
-                                                {{ $member->name }}
+                                                {{ strtok($member->name, ' ').' '.strtok($member->last_name, ' ') }}
                                                 @if(Auth::user()->isAdmin())
                                                     [{{ $member->work_area }}]
                                                 @endif
