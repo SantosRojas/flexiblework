@@ -82,11 +82,12 @@
                                         <option value="">Seleccionar empleado...</option>
                                         @foreach($teamMembers as $member)
                                             <option value="{{ $member->id }}">
-                                                {{ strtok($member->name, ' ').' '.strtok($member->last_name, ' ') }}
+                                                {{ strtok($member->name, ' ') . ' ' . strtok($member->last_name, ' ') }}
                                                 @if(Auth::user()->isAdmin())
                                                     [{{ $member->work_area }}]
                                                 @endif
-                                                ({{ $member->homeOfficeDaysInMonth($month, $year) }}/{{ $maxDaysPerMonth }} días usados)
+                                                ({{ $member->homeOfficeDaysInMonth($month, $year) }}/{{ $maxDaysPerMonth }} días
+                                                usados)
                                             </option>
                                         @endforeach
                                     </select>
@@ -99,7 +100,8 @@
                                         class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm cursor-pointer">
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                                         📅 Solo días hábiles desde hoy hasta fin de
-                                        {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }} (fines de semana deshabilitados)
+                                        {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }} (fines de semana
+                                        deshabilitados)
                                     </p>
                                 </div>
 
@@ -184,29 +186,61 @@
                             </svg>
                         </div>
 
-                        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-                            Aún no es momento de asignar
-                        </h3>
+                        @php
+                            $status = $planningPeriod['status'] ?? 'before';
+                        @endphp
 
-                        <p class="text-gray-600 dark:text-gray-400 mb-6">
-                            El período de planificación para
-                            <strong>{{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
-                                {{ $year }}</strong>
-                            aún no está activo.
-                        </p>
+                        @if($status === 'just_ended')
+                            {{-- Período recién terminado (menos de 3 días) --}}
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                                ⛔ El período de asignación ya finalizó
+                            </h3>
 
-                        <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg inline-block">
-                            <p class="text-blue-800 dark:text-blue-200">
-                                <span class="font-semibold">📅 Período de planificación:</span>
-                                <br>
-                                <span class="text-lg">{{ $planningPeriod['start']->format('d/m/Y') }} -
-                                    {{ $planningPeriod['end']->format('d/m/Y') }}</span>
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                                El período de planificación para
+                                <strong>{{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
+                                    {{ $year }}</strong>
+                                terminó el {{ $planningPeriod['end']->format('d/m/Y') }}.
                             </p>
-                        </div>
 
-                        <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
-                            Regresa durante el período indicado para realizar las asignaciones de home office.
-                        </p>
+                            <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg inline-block">
+                                <p class="text-red-800 dark:text-red-200">
+                                    <span class="font-semibold">📅 El período fue:</span>
+                                    <br>
+                                    <span class="text-lg">{{ $planningPeriod['start']->format('d/m/Y') }} -
+                                        {{ $planningPeriod['end']->format('d/m/Y') }}</span>
+                                </p>
+                            </div>
+
+                            <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
+                                Las asignaciones para este mes ya no pueden ser modificadas.
+                            </p>
+                        @else
+                            {{-- Período aún no comienza --}}
+                            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                                Aún no es momento de asignar
+                            </h3>
+
+                            <p class="text-gray-600 dark:text-gray-400 mb-6">
+                                El período de planificación para
+                                <strong>{{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
+                                    {{ $year }}</strong>
+                                aún no está activo.
+                            </p>
+
+                            <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg inline-block">
+                                <p class="text-blue-800 dark:text-blue-200">
+                                    <span class="font-semibold">📅 Período de planificación:</span>
+                                    <br>
+                                    <span class="text-lg">{{ $planningPeriod['start']->format('d/m/Y') }} -
+                                        {{ $planningPeriod['end']->format('d/m/Y') }}</span>
+                                </p>
+                            </div>
+
+                            <p class="mt-6 text-sm text-gray-500 dark:text-gray-400">
+                                Regresa durante el período indicado para realizar las asignaciones de home office.
+                            </p>
+                        @endif
                     </div>
                 </div>
             @endif
@@ -216,34 +250,34 @@
 
     {{-- Flatpickr CSS y JS para el calendario --}}
     @push('styles')
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
     @endpush
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dateInput = document.getElementById('date');
-            if (dateInput) {
-                flatpickr(dateInput, {
-                    locale: 'es',
-                    dateFormat: 'Y-m-d',
-                    minDate: '{{ now()->toDateString() }}',
-                    maxDate: '{{ Carbon\Carbon::create($year, $month, 1)->endOfMonth()->toDateString() }}',
-                    defaultDate: '{{ now()->toDateString() }}',
-                    disableMobile: false,
-                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
-                    disable: [
-                        function(date) {
-                            // Deshabilitar fines de semana (0 = domingo, 6 = sábado)
-                            return (date.getDay() === 0 || date.getDay() === 6);
-                        }
-                    ]
-                });
-            }
-        });
-    </script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const dateInput = document.getElementById('date');
+                if (dateInput) {
+                    flatpickr(dateInput, {
+                        locale: 'es',
+                        dateFormat: 'Y-m-d',
+                        minDate: '{{ now()->toDateString() }}',
+                        maxDate: '{{ Carbon\Carbon::create($year, $month, 1)->endOfMonth()->toDateString() }}',
+                        defaultDate: '{{ now()->toDateString() }}',
+                        disableMobile: false,
+                        theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                        disable: [
+                            function (date) {
+                                // Deshabilitar fines de semana (0 = domingo, 6 = sábado)
+                                return (date.getDay() === 0 || date.getDay() === 6);
+                            }
+                        ]
+                    });
+                }
+            });
+        </script>
     @endpush
 </x-app-layout>

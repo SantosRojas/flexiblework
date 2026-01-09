@@ -7,6 +7,12 @@ use Carbon\Carbon;
 
 class PlanningPeriodService
 {
+    // Estados del período
+    const STATUS_BEFORE = 'before';      // Antes del período
+    const STATUS_ACTIVE = 'active';      // Durante el período
+    const STATUS_JUST_ENDED = 'just_ended'; // Terminó hace menos de 3 días
+    const STATUS_ENDED = 'ended';        // Terminó hace más de 3 días
+
     /**
      * Obtener información del período de planificación para un mes específico
      * 
@@ -38,14 +44,41 @@ class PlanningPeriodService
     }
 
     /**
-     * Verificar si actualmente estamos en período de planificación para un mes específico
+     * Obtener el estado del período de planificación
+     * 
+     * @return string STATUS_BEFORE, STATUS_ACTIVE, STATUS_JUST_ENDED, o STATUS_ENDED
      */
-    public static function isInPlanningPeriod(int $month, int $year): bool
+    public static function getPeriodStatus(int $month, int $year): string
     {
         $now = Carbon::now();
         $period = self::getPlanningPeriod($month, $year);
         
-        return $now->between($period['start'], $period['end']);
+        // Si estamos antes del período
+        if ($now->lt($period['start'])) {
+            return self::STATUS_BEFORE;
+        }
+        
+        // Si estamos durante el período
+        if ($now->between($period['start'], $period['end'])) {
+            return self::STATUS_ACTIVE;
+        }
+        
+        // Si ya pasó el período, verificar cuántos días han pasado
+        $daysSinceEnd = $period['end']->diffInDays($now);
+        
+        if ($daysSinceEnd <= 3) {
+            return self::STATUS_JUST_ENDED;
+        }
+        
+        return self::STATUS_ENDED;
+    }
+
+    /**
+     * Verificar si actualmente estamos en período de planificación para un mes específico
+     */
+    public static function isInPlanningPeriod(int $month, int $year): bool
+    {
+        return self::getPeriodStatus($month, $year) === self::STATUS_ACTIVE;
     }
 
     /**
@@ -72,15 +105,23 @@ class PlanningPeriodService
     public static function getPlanningPeriodMessage(int $month, int $year): string
     {
         $period = self::getPlanningPeriod($month, $year);
-        $isActive = self::isInPlanningPeriod($month, $year);
+        $status = self::getPeriodStatus($month, $year);
         
         $monthName = Carbon::create($year, $month, 1)->locale('es')->monthName;
         
-        if ($isActive) {
-            return "✅ Período de planificación ACTIVO para {$monthName}: del {$period['start']->format('d/m')} al {$period['end']->format('d/m')}";
+        switch ($status) {
+            case self::STATUS_ACTIVE:
+                return "✅ Período de planificación ACTIVO para {$monthName}: del {$period['start']->format('d/m')} al {$period['end']->format('d/m')}";
+            
+            case self::STATUS_JUST_ENDED:
+                return "⛔ El período de planificación para {$monthName} ya finalizó el {$period['end']->format('d/m/Y')}";
+            
+            case self::STATUS_BEFORE:
+                return "⏰ El período de planificación para {$monthName} será del {$period['start']->format('d/m')} al {$period['end']->format('d/m')}";
+            
+            default: // STATUS_ENDED
+                return "⏰ El período de planificación para {$monthName} es del {$period['start']->format('d/m')} al {$period['end']->format('d/m')}";
         }
-        
-        return "⏰ El período de planificación para {$monthName} es del {$period['start']->format('d/m')} al {$period['end']->format('d/m')}";
     }
 
     /**
@@ -89,12 +130,14 @@ class PlanningPeriodService
     public static function getPlanningPeriodInfo(int $month, int $year): array
     {
         $period = self::getPlanningPeriod($month, $year);
-        $isActive = self::isInPlanningPeriod($month, $year);
+        $status = self::getPeriodStatus($month, $year);
+        $isActive = $status === self::STATUS_ACTIVE;
         
         return [
             'start' => $period['start'],
             'end' => $period['end'],
             'isActive' => $isActive,
+            'status' => $status,
             'message' => self::getPlanningPeriodMessage($month, $year),
             'canPlan' => $isActive,
         ];
