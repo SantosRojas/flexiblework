@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('flexible_schedule_assignments', function (Blueprint $table) {
             //agregagamos hora de almuerzo
-            $table->time('lunch_start_time')->nullable()->after('date')->default('12:00:00');
+            $table->time('lunch_start_time')->nullable()->after('start_time')->default('12:00:00');
         });
     }
 
