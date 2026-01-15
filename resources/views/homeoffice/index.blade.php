@@ -79,15 +79,15 @@
                                     <x-input-label for="user_id" value="Empleado" />
                                     <select name="user_id" id="user_id" required
                                         class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                        <option value="">Seleccionar empleado...</option>
+                                        <option value="" data-days-used="0">Seleccionar empleado...</option>
                                         @foreach($teamMembers as $member)
-                                            <option value="{{ $member->id }}">
+                                            @php $daysUsed = $member->homeOfficeDaysInMonth($month, $year); @endphp
+                                            <option value="{{ $member->id }}" data-days-used="{{ $daysUsed }}">
                                                 {{ strtok($member->name, ' ') . ' ' . strtok($member->last_name, ' ') }}
                                                 @if(Auth::user()->isAdmin())
                                                     [{{ $member->work_area }}]
                                                 @endif
-                                                ({{ $member->homeOfficeDaysInMonth($month, $year) }}/{{ $maxDaysPerMonth }} días
-                                                usados)
+                                                ({{ $daysUsed }}/{{ $maxDaysPerMonth }} días usados)
                                             </option>
                                         @endforeach
                                     </select>
@@ -96,12 +96,14 @@
                                 <div>
                                     <x-input-label for="dates" value="Fechas de Home Office" />
                                     <input type="text" name="dates" id="dates" required readonly
-                                        placeholder="Selecciona una o más fechas..."
-                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm cursor-pointer">
+                                        placeholder="Primero selecciona un empleado..."
+                                        class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm cursor-pointer disabled:opacity-50"
+                                        disabled>
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                        📅 Selecciona múltiples días hábiles desde hoy hasta fin de
-                                        {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }} (haz clic en cada
-                                        fecha que desees asignar)
+                                        📅 Selecciona días hábiles desde hoy hasta fin de
+                                        {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
+                                    </p>
+                                    <p id="days-available-info" class="mt-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 hidden">
                                     </p>
                                     <div id="selected-dates-preview" class="mt-2 flex flex-wrap gap-2"></div>
                                 </div>
@@ -262,9 +264,16 @@
             document.addEventListener('DOMContentLoaded', function () {
                 const datesInput = document.getElementById('dates');
                 const previewContainer = document.getElementById('selected-dates-preview');
+                const userSelect = document.getElementById('user_id');
+                const daysAvailableInfo = document.getElementById('days-available-info');
+                const maxDaysPerMonth = {{ $maxDaysPerMonth }};
+                
+                let fp = null;
+                let maxSelectableDates = 0;
 
-                if (datesInput) {
-                    const fp = flatpickr(datesInput, {
+                if (datesInput && userSelect) {
+                    // Inicializar flatpickr
+                    fp = flatpickr(datesInput, {
                         locale: 'es',
                         dateFormat: 'Y-m-d',
                         minDate: '{{ now()->toDateString() }}',
@@ -272,17 +281,91 @@
                         mode: 'multiple',
                         conjunction: ', ',
                         disableMobile: true,
+                        clickOpens: false, // Deshabilitado hasta seleccionar empleado
                         theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
                         disable: [
                             function (date) {
-                                // Deshabilitar fines de semana (0 = domingo, 6 = sábado)
                                 return (date.getDay() === 0 || date.getDay() === 6);
                             }
                         ],
                         onChange: function (selectedDates, dateStr, instance) {
+                            // Limitar la cantidad de fechas seleccionadas
+                            if (selectedDates.length > maxSelectableDates) {
+                                // Remover la última fecha agregada
+                                const limitedDates = selectedDates.slice(0, maxSelectableDates);
+                                instance.setDate(limitedDates);
+                                
+                                // Mostrar alerta
+                                showLimitAlert();
+                                return;
+                            }
                             updatePreview(selectedDates, instance);
                         }
                     });
+                    
+                    // Escuchar cambios en el select de empleado
+                    userSelect.addEventListener('change', function() {
+                        const selectedOption = this.options[this.selectedIndex];
+                        const daysUsed = parseInt(selectedOption.dataset.daysUsed) || 0;
+                        maxSelectableDates = maxDaysPerMonth - daysUsed;
+                        
+                        // Limpiar fechas seleccionadas
+                        fp.clear();
+                        previewContainer.innerHTML = '';
+                        
+                        if (this.value) {
+                            // Habilitar el selector de fechas
+                            datesInput.disabled = false;
+                            datesInput.placeholder = 'Selecciona una o más fechas...';
+                            fp.set('clickOpens', true);
+                            
+                            // Mostrar días disponibles
+                            if (maxSelectableDates > 0) {
+                                daysAvailableInfo.textContent = `✨ Puedes seleccionar hasta ${maxSelectableDates} día(s) para este empleado`;
+                                daysAvailableInfo.classList.remove('hidden', 'text-red-600', 'dark:text-red-400');
+                                daysAvailableInfo.classList.add('text-indigo-600', 'dark:text-indigo-400');
+                            } else {
+                                daysAvailableInfo.textContent = `⚠️ Este empleado ya tiene ${maxDaysPerMonth} días asignados (límite alcanzado)`;
+                                daysAvailableInfo.classList.remove('hidden', 'text-indigo-600', 'dark:text-indigo-400');
+                                daysAvailableInfo.classList.add('text-red-600', 'dark:text-red-400');
+                                datesInput.disabled = true;
+                                datesInput.placeholder = 'Límite de días alcanzado';
+                                fp.set('clickOpens', false);
+                            }
+                        } else {
+                            // Deshabilitar el selector de fechas
+                            datesInput.disabled = true;
+                            datesInput.placeholder = 'Primero selecciona un empleado...';
+                            fp.set('clickOpens', false);
+                            daysAvailableInfo.classList.add('hidden');
+                        }
+                    });
+                    
+                    // Click en el input abre el calendario si está habilitado
+                    datesInput.addEventListener('click', function() {
+                        if (!this.disabled && fp) {
+                            fp.open();
+                        }
+                    });
+                    
+                    function showLimitAlert() {
+                        // Crear alerta temporal
+                        const alert = document.createElement('div');
+                        alert.className = 'fixed top-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg shadow-lg z-50 animate-pulse';
+                        alert.innerHTML = `
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span>Solo puedes seleccionar ${maxSelectableDates} día(s) para este empleado</span>
+                            </div>
+                        `;
+                        document.body.appendChild(alert);
+                        
+                        setTimeout(() => {
+                            alert.remove();
+                        }, 3000);
+                    }
 
                     function updatePreview(selectedDates, fpInstance) {
                         previewContainer.innerHTML = '';
@@ -321,10 +404,11 @@
                             previewContainer.appendChild(badge);
                         });
 
-                        // Mostrar contador
+                        // Mostrar contador con límite
                         const counter = document.createElement('span');
-                        counter.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-                        counter.textContent = `${selectedDates.length} día(s) seleccionado(s)`;
+                        const isAtLimit = selectedDates.length >= maxSelectableDates;
+                        counter.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isAtLimit ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'}`;
+                        counter.textContent = `${selectedDates.length}/${maxSelectableDates} día(s) seleccionado(s)`;
                         previewContainer.appendChild(counter);
                     }
                 }
