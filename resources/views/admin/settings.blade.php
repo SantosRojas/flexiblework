@@ -4,10 +4,6 @@
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight flex items-center">
                 <x-icons.settings class="w-6 h-6 mr-2" /> {{ __('Configuración del Sistema') }}
             </h2>
-            <a href="{{ route('admin.users.index') }}"
-               class="inline-flex items-center px-4 py-2 bg-gray-600 dark:bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-500 dark:hover:bg-gray-600">
-                <x-icons.users class="w-4 h-4 mr-1" /> Gestión de Usuarios
-            </a>
         </div>
     </x-slot>
 
