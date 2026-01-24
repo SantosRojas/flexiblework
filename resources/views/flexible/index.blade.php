@@ -77,13 +77,13 @@
                                 @endif
                             </h3>
 
-                            {{-- Información de horarios disponibles --}}
+                            <!-- {{-- Información de horarios disponibles --}}
                             <div class="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
                                 <p class="text-sm text-blue-800 dark:text-blue-200 flex items-center">
                                     <x-icons.info class="w-4 h-4 mr-2" />
                                     <span class="font-semibold mr-1">Horarios permitidos:</span> Entre 07:00 y 11:59 AM
                                 </p>
-                            </div>
+                            </div> -->
 
                             <form action="{{ route('flexible-schedule.store') }}" method="POST" class="space-y-4">
                                 @csrf
@@ -144,7 +144,7 @@
                                         value="08:00"
                                         class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                        Selecciona un horario predefinido o ingresa uno personalizado (07:00 - 11:59 AM)
+                                        Selecciona un horario predefinido o ingresa uno personalizado
                                     </p>
                                 </div>
 
@@ -172,7 +172,7 @@
                                         value="12:00"
                                         class="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                        Selecciona la hora de inicio del almuerzo (11:00 - 15:59)
+                                        Selecciona la hora de inicio del almuerzo (11:00 - 15:00)
                                     </p>
                                 </div>
 
