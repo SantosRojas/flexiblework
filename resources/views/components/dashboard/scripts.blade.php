@@ -86,4 +86,62 @@
     document.getElementById('flexibleModal').addEventListener('click', function (e) {
         if (e.target === this) closeFlexibleModal();
     });
+
+    // Función para filtrar calendario de Home Office por nombre
+    function filterHomeOffice(searchTerm) {
+        searchTerm = searchTerm.toLowerCase().trim();
+        const calendarDays = document.querySelectorAll('.calendar-day');
+
+        calendarDays.forEach(day => {
+            const dateKey = day.dataset.date;
+            const assignments = assignmentsByDate[dateKey] || [];
+
+            if (searchTerm === '') {
+                // Sin filtro, mostrar todos
+                day.classList.remove('opacity-30', 'ring-2', 'ring-yellow-400');
+            } else {
+                // Verificar si alguna persona coincide con el término de búsqueda
+                const hasMatch = assignments.some(a =>
+                    (a.name + ' ' + a.last_name).toLowerCase().includes(searchTerm)
+                );
+
+                if (hasMatch) {
+                    day.classList.remove('opacity-30');
+                    day.classList.add('ring-2', 'ring-yellow-400');
+                } else {
+                    day.classList.add('opacity-30');
+                    day.classList.remove('ring-2', 'ring-yellow-400');
+                }
+            }
+        });
+    }
+
+    // Función para filtrar Horarios Flexibles por nombre
+    function filterFlexible(searchTerm) {
+        searchTerm = searchTerm.toLowerCase().trim();
+        const areaCards = document.querySelectorAll('.flexible-area');
+
+        areaCards.forEach(card => {
+            const area = card.dataset.area;
+            const assignments = flexibleByArea[area] || [];
+
+            if (searchTerm === '') {
+                // Sin filtro, mostrar todos
+                card.style.display = '';
+                card.classList.remove('ring-2', 'ring-yellow-400');
+            } else {
+                // Verificar si alguna persona coincide con el término de búsqueda
+                const hasMatch = assignments.some(a =>
+                    (a.name + ' ' + a.last_name).toLowerCase().includes(searchTerm)
+                );
+
+                if (hasMatch) {
+                    card.style.display = '';
+                    card.classList.add('ring-2', 'ring-yellow-400');
+                } else {
+                    card.style.display = 'none';
+                }
+            }
+        });
+    }
 </script>

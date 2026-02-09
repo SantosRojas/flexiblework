@@ -23,31 +23,43 @@
         </div>
 
         @if($flexibleAssignments->count() > 0)
-            {{-- Leyenda --}}
-            <div class="flex flex-wrap gap-4 mb-4 text-sm">
-                <div class="flex items-center">
-                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                    <span class="text-gray-600 dark:text-gray-400">08:00</span>
+            {{-- Buscador y Leyenda --}}
+            <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+                <div class="flex flex-wrap gap-4 text-sm">
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                        <span class="text-gray-600 dark:text-gray-400">08:00</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+                        <span class="text-gray-600 dark:text-gray-400">08:30</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                        <span class="text-gray-600 dark:text-gray-400">09:00</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
+                        <span class="text-gray-600 dark:text-gray-400">Otros</span>
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
-                    <span class="text-gray-600 dark:text-gray-400">08:30</span>
-                </div>
-                <div class="flex items-center">
-                    <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                    <span class="text-gray-600 dark:text-gray-400">09:00</span>
-                </div>
-                <div class="flex items-center">
-                    <span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
-                    <span class="text-gray-600 dark:text-gray-400">Otros</span>
+                <div class="relative">
+                    <input type="text" id="flexibleSearch" placeholder="Buscar por nombre..."
+                        class="w-48 pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        onkeyup="filterFlexible(this.value)">
+                    <svg class="w-4 h-4 absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                 </div>
             </div>
 
             {{-- Grid de áreas --}}
-            <div class="flex flex-wrap gap-2">
+            <div id="flexibleGrid" class="flex flex-wrap gap-2">
                 @foreach($groupedByArea as $area => $areaAssignments)
-                    <div onclick="openFlexibleModal('{{ $area }}')"
-                        class="w-[calc(14.28%-0.5rem)] min-w-[120px] h-20 p-2 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30 hover:border-green-400 dark:hover:border-green-500 transition-all overflow-hidden">
+                    <div data-area="{{ $area }}" onclick="openFlexibleModal('{{ $area }}')"
+                        class="flexible-area w-[calc(14.28%-0.5rem)] min-w-[120px] h-20 p-2 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30 hover:border-green-400 dark:hover:border-green-500 transition-all overflow-hidden">
                         <div class="flex justify-between items-start">
                             <span class="text-sm font-bold text-gray-700 dark:text-gray-300 truncate" title="{{ $area }}">
                                 {{ Str::limit($area, 12) }}

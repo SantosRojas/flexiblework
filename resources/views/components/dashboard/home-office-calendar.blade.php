@@ -56,19 +56,31 @@
             @endif
         </div>
 
-        {{-- Leyenda --}}
-        <div class="flex flex-wrap gap-4 mb-4 text-sm">
-            <div class="flex items-center">
-                <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                <span class="text-gray-600 dark:text-gray-400">Tiene asignaciones</span>
+        {{-- Buscador y Leyenda --}}
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
+            <div class="flex flex-wrap gap-4 text-sm">
+                <div class="flex items-center">
+                    <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Tiene asignaciones</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Hoy</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-3 h-3 bg-gray-300 dark:bg-gray-600 rounded-full mr-2"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Fin de semana</span>
+                </div>
             </div>
-            <div class="flex items-center">
-                <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                <span class="text-gray-600 dark:text-gray-400">Hoy</span>
-            </div>
-            <div class="flex items-center">
-                <span class="w-3 h-3 bg-gray-300 dark:bg-gray-600 rounded-full mr-2"></span>
-                <span class="text-gray-600 dark:text-gray-400">Fin de semana</span>
+            <div class="relative">
+                <input type="text" id="homeOfficeSearch" placeholder="Buscar por nombre..."
+                    class="w-48 pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    onkeyup="filterHomeOffice(this.value)">
+                <svg class="w-4 h-4 absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
             </div>
         </div>
 
@@ -99,13 +111,13 @@
                     $dayAssignments = $assignmentsByDate->get($dateKey, collect());
                     $hasAssignments = $dayAssignments->count() > 0;
                 @endphp
-                <div @if($hasAssignments && !$isWeekend)
+                <div data-date="{{ $dateKey }}" @if($hasAssignments && !$isWeekend)
                     onclick="openDayModal('{{ $dateKey }}', '{{ $currentDate->locale('es')->isoFormat('dddd D [de] MMMM') }}')"
-                @endif class="h-20 p-2 rounded-lg border-2 transition-all overflow-hidden
-                                    {{ $isWeekend ? 'bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700' }}
-                                    {{ $isToday ? 'ring-2 ring-green-500 ring-offset-2 dark:ring-offset-gray-800' : '' }}
-                                    {{ $hasAssignments && !$isWeekend ? 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:border-blue-400 dark:hover:border-blue-500' : '' }}
-                                ">
+                @endif class="calendar-day h-20 p-2 rounded-lg border-2 transition-all overflow-hidden
+                                        {{ $isWeekend ? 'bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700' }}
+                                        {{ $isToday ? 'ring-2 ring-green-500 ring-offset-2 dark:ring-offset-gray-800' : '' }}
+                                        {{ $hasAssignments && !$isWeekend ? 'cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/50 hover:border-blue-400 dark:hover:border-blue-500' : '' }}
+                                    ">
                     <div class="flex justify-between items-start">
                         <span
                             class="text-sm font-bold {{ $isToday ? 'text-green-600 dark:text-green-400' : ($isWeekend ? 'text-gray-400 dark:text-gray-500' : 'text-gray-700 dark:text-gray-300') }}">
