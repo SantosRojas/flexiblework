@@ -106,13 +106,13 @@ class DashboardController extends Controller
             })->values();
         });
 
-        // Datos para JavaScript - Horarios Flexibles agrupados por área (visible para todos)
+        // Datos para JavaScript - Horarios Flexibles agrupados por área y hora (visible para todos)
         $flexibleByArea = $flexibleAssignments->groupBy(function($a) {
-            return $a->user->work_area;
+            return $a->user->work_area . '::' . substr($a->start_time, 0, 5);
         })->map(function($items) {
             return $items->map(function($a) {
                 return ['name' => $a->user->name,'last_name' => $a->user->last_name, 'time' => substr($a->start_time, 0, 5)];
-            })->sortBy('time')->values();
+            })->sortBy('name')->values();
         });
 
         return view('dashboard', compact(

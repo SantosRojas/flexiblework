@@ -41,14 +41,15 @@
     }
 
     // Funciones para modal de Horarios Flexibles
-    function openFlexibleModal(area) {
+    function openFlexibleModal(area, time) {
         const modal = document.getElementById('flexibleModal');
         const title = document.getElementById('flexibleModalTitle');
         const content = document.getElementById('flexibleModalContent');
 
-        title.innerHTML = '⏰ ' + area;
+        title.innerHTML = '⏰ ' + area + ' — ' + time;
 
-        const assignments = flexibleByArea[area] || [];
+        const key = area + '::' + time;
+        const assignments = flexibleByArea[key] || [];
 
         if (assignments.length > 0) {
             content.innerHTML = assignments.map(a => {

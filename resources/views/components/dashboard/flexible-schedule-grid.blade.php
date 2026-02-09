@@ -68,7 +68,8 @@
                         <div class="border-2 {{ $colors['border'] }} border-t-0 rounded-b-lg p-3">
                             <div class="flex flex-wrap gap-2">
                                 @foreach($byArea as $area => $areaAssignments)
-                                    <div data-area="{{ $area }}" onclick="openFlexibleModal('{{ $area }}')"
+                                    <div data-area="{{ $area }}" data-time="{{ $time }}"
+                                        onclick="openFlexibleModal('{{ $area }}', '{{ $time }}')"
                                         class="flexible-area min-w-[130px] flex-1 max-w-[200px] p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer {{ $colors['hover'] }} hover:border-current transition-all">
                                         <div class="flex justify-between items-center mb-1.5">
                                             <span
