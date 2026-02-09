@@ -66,7 +66,7 @@
                         $colors = $timeColors[$time] ?? $colorPalette[0];
                         $byArea = $timeAssignments->groupBy(fn($a) => $a->user->work_area)->sortKeys();
                     @endphp
-                    <div>
+                    <div class="flexible-time-group">
                         {{-- Encabezado del horario --}}
                         <div class="flex items-center justify-between px-3 py-2 rounded-t-lg {{ $colors['headerBg'] }}">
                             <div class="flex items-center">

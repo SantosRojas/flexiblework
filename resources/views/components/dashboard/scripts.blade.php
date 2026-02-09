@@ -27,7 +27,7 @@
     const flexibleByArea = @json($flexibleByArea);
 
     // Inicializar mapa de colores por horario
-    (function() {
+    (function () {
         const allTimes = new Set();
         Object.values(flexibleByArea || {}).forEach(arr => arr.forEach(a => allTimes.add(a.time)));
         [...allTimes].sort().forEach((time, i) => {
@@ -159,7 +159,7 @@
 
             names.forEach(p => {
                 if (p.textContent.toLowerCase().trim().includes(searchTerm)) {
-           hasMatch = true;
+                    hasMatch = true;
                 }
             });
 
@@ -169,6 +169,12 @@
             } else {
                 card.style.display = 'none';
             }
+        });
+
+        // Ocultar grupos de horario que no tengan tarjetas visibles
+        document.querySelectorAll('.flexible-time-group').forEach(group => {
+            const visibleCards = group.querySelectorAll('.flexible-area:not([style*="display: none"])');
+            group.style.display = (searchTerm !== '' && visibleCards.length === 0) ? 'none' : '';
         });
     }
 </script>
