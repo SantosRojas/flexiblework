@@ -122,25 +122,26 @@
         const areaCards = document.querySelectorAll('.flexible-area');
 
         areaCards.forEach(card => {
-            const area = card.dataset.area;
-            const assignments = flexibleByArea[area] || [];
+            const names = card.querySelectorAll('p');
+            let hasMatch = false;
 
             if (searchTerm === '') {
-                // Sin filtro, mostrar todos
                 card.style.display = '';
                 card.classList.remove('ring-2', 'ring-yellow-400');
-            } else {
-                // Verificar si alguna persona coincide con el término de búsqueda
-                const hasMatch = assignments.some(a =>
-                    (a.name + ' ' + a.last_name).toLowerCase().includes(searchTerm)
-                );
+                return;
+            }
 
-                if (hasMatch) {
-                    card.style.display = '';
-                    card.classList.add('ring-2', 'ring-yellow-400');
-                } else {
-                    card.style.display = 'none';
+            names.forEach(p => {
+                if (p.textContent.toLowerCase().trim().includes(searchTerm)) {
+                    hasMatch = true;
                 }
+            });
+
+            if (hasMatch) {
+                card.style.display = '';
+                card.classList.add('ring-2', 'ring-yellow-400');
+            } else {
+                card.style.display = 'none';
             }
         });
     }

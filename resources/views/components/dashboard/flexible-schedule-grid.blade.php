@@ -1,7 +1,15 @@
 @props(['currentYear', 'currentMonth', 'flexibleAssignments'])
 
 @php
-    $groupedByArea = $flexibleAssignments->groupBy(fn($a) => $a->user->work_area)->sortKeys();
+    // Agrupar por horario de ingreso, y dentro de cada horario por área
+    $groupedByTime = $flexibleAssignments->groupBy(fn($a) => substr($a->start_time, 0, 5))->sortKeys();
+
+    $timeColors = [
+        '08:00' => ['bg' => 'bg-green-500', 'border' => 'border-green-400 dark:border-green-600', 'headerBg' => 'bg-green-100 dark:bg-green-900', 'text' => 'text-green-800 dark:text-green-200', 'badge' => 'bg-green-500', 'hover' => 'hover:bg-green-50 dark:hover:bg-green-900/30'],
+        '08:30' => ['bg' => 'bg-yellow-500', 'border' => 'border-yellow-400 dark:border-yellow-600', 'headerBg' => 'bg-yellow-100 dark:bg-yellow-900', 'text' => 'text-yellow-800 dark:text-yellow-200', 'badge' => 'bg-yellow-500', 'hover' => 'hover:bg-yellow-50 dark:hover:bg-yellow-900/30'],
+        '09:00' => ['bg' => 'bg-blue-500', 'border' => 'border-blue-400 dark:border-blue-600', 'headerBg' => 'bg-blue-100 dark:bg-blue-900', 'text' => 'text-blue-800 dark:text-blue-200', 'badge' => 'bg-blue-500', 'hover' => 'hover:bg-blue-50 dark:hover:bg-blue-900/30'],
+    ];
+    $defaultColor = ['bg' => 'bg-purple-500', 'border' => 'border-purple-400 dark:border-purple-600', 'headerBg' => 'bg-purple-100 dark:bg-purple-900', 'text' => 'text-purple-800 dark:text-purple-200', 'badge' => 'bg-purple-500', 'hover' => 'hover:bg-purple-50 dark:hover:bg-purple-900/30'];
 @endphp
 
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
@@ -23,26 +31,8 @@
         </div>
 
         @if($flexibleAssignments->count() > 0)
-            {{-- Buscador y Leyenda --}}
-            <div class="flex flex-wrap justify-between items-center gap-4 mb-4">
-                <div class="flex flex-wrap gap-4 text-sm">
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
-                        <span class="text-gray-600 dark:text-gray-400">08:00</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
-                        <span class="text-gray-600 dark:text-gray-400">08:30</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-                        <span class="text-gray-600 dark:text-gray-400">09:00</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
-                        <span class="text-gray-600 dark:text-gray-400">Otros</span>
-                    </div>
-                </div>
+            {{-- Buscador --}}
+            <div class="flex justify-end mb-4">
                 <div class="relative">
                     <input type="text" id="flexibleSearch" placeholder="Buscar por nombre..."
                         class="w-48 pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500"
@@ -55,30 +45,53 @@
                 </div>
             </div>
 
-            {{-- Grid de áreas --}}
-            <div id="flexibleGrid" class="flex flex-wrap gap-2">
-                @foreach($groupedByArea as $area => $areaAssignments)
-                    <div data-area="{{ $area }}" onclick="openFlexibleModal('{{ $area }}')"
-                        class="flexible-area w-[calc(14.28%-0.5rem)] min-w-[120px] h-20 p-2 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/30 hover:border-green-400 dark:hover:border-green-500 transition-all overflow-hidden">
-                        <div class="flex justify-between items-start">
-                            <span class="text-sm font-bold text-gray-700 dark:text-gray-300 truncate" title="{{ $area }}">
-                                {{ Str::limit($area, 12) }}
-                            </span>
-                            <span
-                                class="flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-green-500 rounded-full shadow-sm">
-                                {{ $areaAssignments->count() }}
+            {{-- Filas por horario de ingreso (vertical), áreas en horizontal --}}
+            <div id="flexibleGrid" class="space-y-4">
+                @foreach($groupedByTime as $time => $timeAssignments)
+                    @php
+                        $colors = $timeColors[$time] ?? $defaultColor;
+                        $byArea = $timeAssignments->groupBy(fn($a) => $a->user->work_area)->sortKeys();
+                    @endphp
+                    <div>
+                        {{-- Encabezado del horario --}}
+                        <div class="flex items-center justify-between px-3 py-2 rounded-t-lg {{ $colors['headerBg'] }}">
+                            <div class="flex items-center">
+                                <span class="w-3 h-3 {{ $colors['bg'] }} rounded-full mr-2"></span>
+                                <span class="font-bold text-sm {{ $colors['text'] }}">{{ $time }}</span>
+                            </div>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white {{ $colors['badge'] }}">
+                                {{ $timeAssignments->count() }}
                             </span>
                         </div>
-                        <div class="mt-1 space-y-0.5">
-                            @foreach($areaAssignments->take(2) as $assignment)
-                                <p class="text-xs text-green-600 dark:text-green-400 truncate leading-tight">
-                                    {{ Str::before($assignment->user->name, ' ') }}
-                                    {{ Str::before($assignment->user->last_name, ' ') }}
-                                </p>
-                            @endforeach
-                            @if($areaAssignments->count() > 2)
-                                <p class="text-xs text-gray-500 dark:text-gray-400">+{{ $areaAssignments->count() - 2 }} más</p>
-                            @endif
+
+                        {{-- Áreas en horizontal --}}
+                        <div class="border-2 {{ $colors['border'] }} border-t-0 rounded-b-lg p-3">
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($byArea as $area => $areaAssignments)
+                                    <div data-area="{{ $area }}" onclick="openFlexibleModal('{{ $area }}')"
+                                        class="flexible-area min-w-[130px] flex-1 max-w-[200px] p-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 cursor-pointer {{ $colors['hover'] }} hover:border-current transition-all">
+                                        <div class="flex justify-between items-center mb-1.5">
+                                            <span
+                                                class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wide truncate"
+                                                title="{{ $area }}">
+                                                {{ Str::limit($area, 15) }}
+                                            </span>
+                                            <span
+                                                class="text-xs font-semibold px-1.5 py-0.5 rounded-full text-white {{ $colors['badge'] }} ml-1 flex-shrink-0">
+                                                {{ $areaAssignments->count() }}
+                                            </span>
+                                        </div>
+                                        <div class="space-y-0.5">
+                                            @foreach($areaAssignments as $assignment)
+                                                <p class="text-xs text-gray-700 dark:text-gray-300 truncate leading-tight">
+                                                    {{ Str::before($assignment->user->name, ' ') }}
+                                                    {{ Str::before($assignment->user->last_name, ' ') }}
+                                                </p>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -88,7 +101,7 @@
             <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
                     <span class="font-semibold">Total:</span> {{ $flexibleAssignments->count() }} persona(s) con horario
-                    flexible en {{ $groupedByArea->count() }} área(s)
+                    flexible en {{ $groupedByTime->count() }} horario(s)
                 </p>
             </div>
         @else
