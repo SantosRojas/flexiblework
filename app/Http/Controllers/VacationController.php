@@ -175,6 +175,13 @@ class VacationController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'notes' => 'nullable|string|max:500',
+        ], [
+            'start_date.required' => 'La fecha de inicio es obligatoria.',
+            'start_date.date' => 'La fecha de inicio no tiene un formato válido.',
+            'end_date.required' => 'La fecha de fin es obligatoria.',
+            'end_date.date' => 'La fecha de fin no tiene un formato válido.',
+            'end_date.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
+            'notes.max' => 'Las notas no pueden exceder 500 caracteres.',
         ]);
         
         $startDate = Carbon::parse($request->start_date);

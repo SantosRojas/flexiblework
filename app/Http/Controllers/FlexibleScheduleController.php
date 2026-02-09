@@ -137,8 +137,15 @@ class FlexibleScheduleController extends Controller
             'start_time' => ['required', 'regex:/^(0[7-9]|1[0-1]):[0-5][0-9]$/'],
             'lunch_start_time' => ['nullable', 'regex:/^(1[1-5]):[0-5][0-9]$/'],
         ], [
-            'start_time.regex' => 'El horario debe estar entre 07:00 y 11:59 AM en formato HH:MM',
-            'lunch_start_time.regex' => 'La hora de almuerzo debe estar entre 11:00 y 15:59 en formato HH:MM',
+            'user_id.required' => 'Debes seleccionar un empleado.',
+            'user_id.exists' => 'El empleado seleccionado no existe en el sistema.',
+            'month.required' => 'El mes es obligatorio.',
+            'month.between' => 'El mes debe estar entre 1 y 12.',
+            'year.required' => 'El año es obligatorio.',
+            'year.min' => 'El año no es válido.',
+            'start_time.required' => 'Debes seleccionar un horario de entrada.',
+            'start_time.regex' => 'El horario de entrada debe estar entre 07:00 y 11:59 (formato HH:MM).',
+            'lunch_start_time.regex' => 'La hora de almuerzo debe estar entre 11:00 y 15:59 (formato HH:MM).',
         ]);
         
         $targetUser = User::findOrFail($request->user_id);
@@ -200,8 +207,9 @@ class FlexibleScheduleController extends Controller
             'start_time' => ['required', 'regex:/^(0[7-9]|1[0-1]):[0-5][0-9]$/'],
             'lunch_start_time' => ['nullable', 'regex:/^(1[1-5]):[0-5][0-9]$/'],
         ], [
-            'start_time.regex' => 'El horario debe estar entre 07:00 y 11:59 AM en formato HH:MM',
-            'lunch_start_time.regex' => 'La hora de almuerzo debe estar entre 11:00 y 15:59 en formato HH:MM',
+            'start_time.required' => 'Debes seleccionar un horario de entrada.',
+            'start_time.regex' => 'El horario de entrada debe estar entre 07:00 y 11:59 (formato HH:MM).',
+            'lunch_start_time.regex' => 'La hora de almuerzo debe estar entre 11:00 y 15:59 (formato HH:MM).',
         ]);
         
         $month = $flexibleSchedule->month;

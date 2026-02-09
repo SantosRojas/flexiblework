@@ -122,6 +122,10 @@ class HomeOfficeController extends Controller
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'dates' => 'required|string',
+        ], [
+            'user_id.required' => 'Debes seleccionar un empleado.',
+            'user_id.exists' => 'El empleado seleccionado no existe en el sistema.',
+            'dates.required' => 'Debes seleccionar al menos una fecha.',
         ]);
         
         $targetUser = User::findOrFail($request->user_id);
