@@ -1,11 +1,39 @@
 @props(['homeOfficeByDate', 'flexibleByArea'])
 
 <script>
+    // Paleta de colores para horarios (se asignan dinámicamente)
+    const _timeColorPalette = [
+        { bg: 'bg-green-50 dark:bg-green-900/30', dot: 'bg-green-500', badge: 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200' },
+        { bg: 'bg-yellow-50 dark:bg-yellow-900/30', dot: 'bg-yellow-500', badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-200' },
+        { bg: 'bg-blue-50 dark:bg-blue-900/30', dot: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200' },
+        { bg: 'bg-purple-50 dark:bg-purple-900/30', dot: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200' },
+        { bg: 'bg-rose-50 dark:bg-rose-900/30', dot: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700 dark:bg-rose-800 dark:text-rose-200' },
+        { bg: 'bg-teal-50 dark:bg-teal-900/30', dot: 'bg-teal-500', badge: 'bg-teal-100 text-teal-700 dark:bg-teal-800 dark:text-teal-200' },
+        { bg: 'bg-orange-50 dark:bg-orange-900/30', dot: 'bg-orange-500', badge: 'bg-orange-100 text-orange-700 dark:bg-orange-800 dark:text-orange-200' },
+        { bg: 'bg-cyan-50 dark:bg-cyan-900/30', dot: 'bg-cyan-500', badge: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-800 dark:text-cyan-200' },
+        { bg: 'bg-indigo-50 dark:bg-indigo-900/30', dot: 'bg-indigo-500', badge: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-800 dark:text-indigo-200' },
+        { bg: 'bg-pink-50 dark:bg-pink-900/30', dot: 'bg-pink-500', badge: 'bg-pink-100 text-pink-700 dark:bg-pink-800 dark:text-pink-200' },
+    ];
+    const _timeColorMap = {};
+
+    function getTimeColor(time) {
+        return _timeColorMap[time] || _timeColorPalette[0];
+    }
+
     // Datos de Home Office
     const assignmentsByDate = @json($homeOfficeByDate);
 
     // Datos de Horarios Flexibles por área
     const flexibleByArea = @json($flexibleByArea);
+
+    // Inicializar mapa de colores por horario
+    (function() {
+        const allTimes = new Set();
+        Object.values(flexibleByArea || {}).forEach(arr => arr.forEach(a => allTimes.add(a.time)));
+        [...allTimes].sort().forEach((time, i) => {
+            _timeColorMap[time] = _timeColorPalette[i % _timeColorPalette.length];
+        });
+    })();
 
     // Funciones para modal de Home Office
     function openDayModal(dateKey, formattedDate) {
@@ -52,15 +80,8 @@
         const assignments = flexibleByArea[key] || [];
 
         if (assignments.length > 0) {
-            const timeColors = {
-                '08:00': { bg: 'bg-green-50 dark:bg-green-900/30', dot: 'bg-green-500', badge: 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200' },
-                '08:30': { bg: 'bg-yellow-50 dark:bg-yellow-900/30', dot: 'bg-yellow-500', badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-200' },
-                '09:00': { bg: 'bg-blue-50 dark:bg-blue-900/30', dot: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200' },
-            };
-            const defaultColors = { bg: 'bg-purple-50 dark:bg-purple-900/30', dot: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200' };
-
             content.innerHTML = assignments.map(a => {
-                const colors = timeColors[a.time] || defaultColors;
+                const colors = getTimeColor(a.time);
 
                 return `
                     <div class="flex items-center justify-between p-3 ${colors.bg} rounded-lg">
