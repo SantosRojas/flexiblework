@@ -89,12 +89,12 @@
                             </h3>
 
                             <!-- {{-- Información de horarios disponibles --}}
-                                    <div class="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-                                        <p class="text-sm text-blue-800 dark:text-blue-200 flex items-center">
-                                            <x-icons.info class="w-4 h-4 mr-2" />
-                                            <span class="font-semibold mr-1">Horarios permitidos:</span> Entre 07:00 y 11:59 AM
-                                        </p>
-                                    </div> -->
+                                            <div class="mb-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                                                <p class="text-sm text-blue-800 dark:text-blue-200 flex items-center">
+                                                    <x-icons.info class="w-4 h-4 mr-2" />
+                                                    <span class="font-semibold mr-1">Horarios permitidos:</span> Entre 07:00 y 11:59 AM
+                                                </p>
+                                            </div> -->
 
                             <form action="{{ route('flexible-schedule.store') }}" method="POST" class="space-y-4">
                                 @csrf
@@ -135,9 +135,9 @@
                                             <button type="button"
                                                 onclick="document.getElementById('start_time').value = '{{ $time }}'"
                                                 class="px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
-                                                                                                                                            {{ $time == '08:00' ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-600 dark:bg-green-900 dark:text-green-300' : '' }}
-                                                                                                                                            {{ $time == '08:30' ? 'border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
-                                                                                                                                            {{ $time == '09:00' ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300' : '' }}">
+                                                                                                                                                        {{ $time == '08:00' ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-600 dark:bg-green-900 dark:text-green-300' : '' }}
+                                                                                                                                                        {{ $time == '08:30' ? 'border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
+                                                                                                                                                        {{ $time == '09:00' ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300' : '' }}">
                                                 {{ $time }}
                                             </button>
                                         @endforeach
@@ -161,11 +161,11 @@
                                             <button type="button"
                                                 onclick="document.getElementById('lunch_start_time').value = '{{ $time }}'"
                                                 class="px-4 py-2 rounded-lg text-sm font-medium border-2 transition-all
-                                                                            {{ $time == '11:00' ? 'border-lime-300 bg-lime-50 text-lime-700 hover:bg-lime-100 dark:border-lime-600 dark:bg-lime-900 dark:text-lime-300' : '' }}
-                                                                            {{ $time == '12:00' ? 'border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-600 dark:bg-orange-900 dark:text-orange-300' : '' }}
-                                                                            {{ $time == '13:00' ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900 dark:text-red-300' : '' }}
-                                                                            {{ $time == '14:00' ? 'border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:bg-purple-900 dark:text-purple-300' : '' }}
-                                                                            {{ $time == '15:00' ? 'border-pink-300 bg-pink-50 text-pink-700 hover:bg-pink-100 dark:border-pink-600 dark:bg-pink-900 dark:text-pink-300' : '' }}">
+                                                                                        {{ $time == '11:00' ? 'border-lime-300 bg-lime-50 text-lime-700 hover:bg-lime-100 dark:border-lime-600 dark:bg-lime-900 dark:text-lime-300' : '' }}
+                                                                                        {{ $time == '12:00' ? 'border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-600 dark:bg-orange-900 dark:text-orange-300' : '' }}
+                                                                                        {{ $time == '13:00' ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900 dark:text-red-300' : '' }}
+                                                                                        {{ $time == '14:00' ? 'border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:bg-purple-900 dark:text-purple-300' : '' }}
+                                                                                        {{ $time == '15:00' ? 'border-pink-300 bg-pink-50 text-pink-700 hover:bg-pink-100 dark:border-pink-600 dark:bg-pink-900 dark:text-pink-300' : '' }}">
                                                 {{ $time }}
                                             </button>
                                         @endforeach
@@ -194,10 +194,21 @@
                     @if($assignments->count() > 0)
                         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="p-6">
-                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                                    Asignaciones de {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
-                                </h3>
-                                <div class="space-y-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                                        Asignaciones de {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
+                                    </h3>
+                                    <div class="relative">
+                                        <input type="text" id="flexSearchAssignments" placeholder="Buscar por nombre..."
+                                            class="w-48 pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                        <svg class="w-4 h-4 absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div id="flexAssignmentsList" class="space-y-2">
                                     @foreach($assignments->sortBy('start_time') as $assignment)
                                         @php
                                             $assignmentTime = substr($assignment->start_time, 0, 5);
@@ -207,10 +218,10 @@
                                             <div class="flex items-center space-x-3">
                                                 <span
                                                     class="px-3 py-1 rounded-full text-sm font-semibold
-                                                                                                                                                                    {{ $assignmentTime == '08:00' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : '' }}
-                                                                                                                                                                    {{ $assignmentTime == '08:30' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' : '' }}
-                                                                                                                                                                    {{ $assignmentTime == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}
-                                                                                                                                                                    {{ !in_array($assignmentTime, ['08:00', '08:30', '09:00']) ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100' : '' }}">
+                                                                                                                                                                                    {{ $assignmentTime == '08:00' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : '' }}
+                                                                                                                                                                                    {{ $assignmentTime == '08:30' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' : '' }}
+                                                                                                                                                                                    {{ $assignmentTime == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}
+                                                                                                                                                                                    {{ !in_array($assignmentTime, ['08:00', '08:30', '09:00']) ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100' : '' }}">
                                                     {{ $assignmentTime }}
                                                 </span>
                                                 <span
@@ -267,10 +278,10 @@
                                             <div class="flex items-center space-x-2">
                                                 <span
                                                     class="px-2 py-1 rounded text-xs font-semibold
-                                                                                                                                                                    {{ $time == '08:00' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : '' }}
-                                                                                                                                                                    {{ $time == '08:30' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' : '' }}
-                                                                                                                                                                    {{ $time == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}
-                                                                                                                                                                    {{ !in_array($time, ['08:00', '08:30', '09:00']) ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100' : '' }}">
+                                                                                                                                                                                    {{ $time == '08:00' ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : '' }}
+                                                                                                                                                                                    {{ $time == '08:30' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100' : '' }}
+                                                                                                                                                                                    {{ $time == '09:00' ? 'bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100' : '' }}
+                                                                                                                                                                                    {{ !in_array($time, ['08:00', '08:30', '09:00']) ? 'bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100' : '' }}">
                                                     {{ $time }}
                                                 </span>
                                                 <span
@@ -422,9 +433,9 @@
                                 <button type="button"
                                     onclick="document.getElementById('edit_start_time').value = '{{ $time }}'"
                                     class="px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all
-                                                                        {{ $time == '08:00' ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-600 dark:bg-green-900 dark:text-green-300' : '' }}
-                                                                        {{ $time == '08:30' ? 'border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
-                                                                        {{ $time == '09:00' ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300' : '' }}">
+                                                                            {{ $time == '08:00' ? 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100 dark:border-green-600 dark:bg-green-900 dark:text-green-300' : '' }}
+                                                                            {{ $time == '08:30' ? 'border-yellow-300 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900 dark:text-yellow-300' : '' }}
+                                                                            {{ $time == '09:00' ? 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:bg-blue-900 dark:text-blue-300' : '' }}">
                                     {{ $time }}
                                 </button>
                             @endforeach
@@ -443,11 +454,11 @@
                                 <button type="button"
                                     onclick="document.getElementById('edit_lunch_start_time').value = '{{ $time }}'"
                                     class="px-3 py-1 rounded-lg text-sm font-medium border-2 transition-all
-                                                {{ $time == '11:00' ? 'border-lime-300 bg-lime-50 text-lime-700 hover:bg-lime-100 dark:border-lime-600 dark:bg-lime-900 dark:text-lime-300' : '' }}
-                                                {{ $time == '12:00' ? 'border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-600 dark:bg-orange-900 dark:text-orange-300' : '' }}
-                                                {{ $time == '13:00' ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900 dark:text-red-300' : '' }}
-                                                {{ $time == '14:00' ? 'border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:bg-purple-900 dark:text-purple-300' : '' }}
-                                                {{ $time == '15:00' ? 'border-pink-300 bg-pink-50 text-pink-700 hover:bg-pink-100 dark:border-pink-600 dark:bg-pink-900 dark:text-pink-300' : '' }}">
+                                                    {{ $time == '11:00' ? 'border-lime-300 bg-lime-50 text-lime-700 hover:bg-lime-100 dark:border-lime-600 dark:bg-lime-900 dark:text-lime-300' : '' }}
+                                                    {{ $time == '12:00' ? 'border-orange-300 bg-orange-50 text-orange-700 hover:bg-orange-100 dark:border-orange-600 dark:bg-orange-900 dark:text-orange-300' : '' }}
+                                                    {{ $time == '13:00' ? 'border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-600 dark:bg-red-900 dark:text-red-300' : '' }}
+                                                    {{ $time == '14:00' ? 'border-purple-300 bg-purple-50 text-purple-700 hover:bg-purple-100 dark:border-purple-600 dark:bg-purple-900 dark:text-purple-300' : '' }}
+                                                    {{ $time == '15:00' ? 'border-pink-300 bg-pink-50 text-pink-700 hover:bg-pink-100 dark:border-pink-600 dark:bg-pink-900 dark:text-pink-300' : '' }}">
                                     {{ $time }}
                                 </button>
                             @endforeach
@@ -482,5 +493,19 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('flexSearchAssignments');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function () {
+                    const term = this.value.toLowerCase().trim();
+                    const items = document.querySelectorAll('#flexAssignmentsList > div');
+                    items.forEach(item => {
+                        const name = item.textContent.toLowerCase();
+                        item.style.display = term === '' || name.includes(term) ? '' : 'none';
+                    });
+                });
+            }
+        });
     </script>
 </x-app-layout>

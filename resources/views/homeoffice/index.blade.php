@@ -139,10 +139,21 @@
                     @if($assignments->count() > 0)
                         <div class="mt-6 bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div class="p-6">
-                                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-                                    Asignaciones de {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
-                                </h3>
-                                <div class="space-y-2">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                                        Asignaciones de {{ Carbon\Carbon::create($year, $month, 1)->locale('es')->monthName }}
+                                    </h3>
+                                    <div class="relative">
+                                        <input type="text" id="hoSearchAssignments" placeholder="Buscar por nombre..."
+                                            class="w-48 pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                        <svg class="w-4 h-4 absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-400"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div id="hoAssignmentsList" class="space-y-2">
                                     @foreach($assignments->sortBy('date') as $assignment)
                                         <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                             <div>
@@ -408,13 +419,13 @@
                         const alert = document.createElement('div');
                         alert.className = 'fixed top-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg shadow-lg z-50 animate-pulse';
                         alert.innerHTML = `
-                                    <div class="flex items-center">
-                                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                                        </svg>
-                                        <span>Solo puedes seleccionar ${maxSelectableDates} día(s) para este empleado</span>
-                                    </div>
-                                `;
+                                        <div class="flex items-center">
+                                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            <span>Solo puedes seleccionar ${maxSelectableDates} día(s) para este empleado</span>
+                                        </div>
+                                    `;
                         document.body.appendChild(alert);
 
                         setTimeout(() => {
@@ -443,13 +454,13 @@
                             });
 
                             badge.innerHTML = `
-                                            ${dateText}
-                                            <button type="button" class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-indigo-200 dark:hover:bg-indigo-700" data-index="${index}">
-                                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                                                </svg>
-                                            </button>
-                                        `;
+                                                ${dateText}
+                                                <button type="button" class="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full hover:bg-indigo-200 dark:hover:bg-indigo-700" data-index="${index}">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </button>
+                                            `;
 
                             badge.querySelector('button').addEventListener('click', function () {
                                 const newDates = fpInstance.selectedDates.filter((_, i) => i !== index);
@@ -469,5 +480,19 @@
                 }
             });
         </script>
-    @endpush
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const searchInput = document.getElementById('hoSearchAssignments');
+                if (searchInput) {
+                    searchInput.addEventListener('keyup', function () {
+                        const term = this.value.toLowerCase().trim();
+                        const items = document.querySelectorAll('#hoAssignmentsList > div');
+                        items.forEach(item => {
+                            const name = item.textContent.toLowerCase();
+                            item.style.display = term === '' || name.includes(term) ? '' : 'none';
+                        });
+                    });
+                }
+            });
+    </script> @endpush
 </x-app-layout>
