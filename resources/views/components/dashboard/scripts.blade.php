@@ -52,19 +52,23 @@
         const assignments = flexibleByArea[key] || [];
 
         if (assignments.length > 0) {
+            const timeColors = {
+                '08:00': { bg: 'bg-green-50 dark:bg-green-900/30', dot: 'bg-green-500', badge: 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200' },
+                '08:30': { bg: 'bg-yellow-50 dark:bg-yellow-900/30', dot: 'bg-yellow-500', badge: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-200' },
+                '09:00': { bg: 'bg-blue-50 dark:bg-blue-900/30', dot: 'bg-blue-500', badge: 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200' },
+            };
+            const defaultColors = { bg: 'bg-purple-50 dark:bg-purple-900/30', dot: 'bg-purple-500', badge: 'bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200' };
+
             content.innerHTML = assignments.map(a => {
-                let colorClass = 'bg-purple-100 text-purple-700 dark:bg-purple-800 dark:text-purple-200';
-                if (a.time === '08:00') colorClass = 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200';
-                else if (a.time === '08:30') colorClass = 'bg-yellow-100 text-yellow-700 dark:bg-yellow-800 dark:text-yellow-200';
-                else if (a.time === '09:00') colorClass = 'bg-blue-100 text-blue-700 dark:bg-blue-800 dark:text-blue-200';
+                const colors = timeColors[a.time] || defaultColors;
 
                 return `
-                    <div class="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/30 rounded-lg">
+                    <div class="flex items-center justify-between p-3 ${colors.bg} rounded-lg">
                         <div class="flex items-center">
-                            <div class="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                            <div class="w-2 h-2 ${colors.dot} rounded-full mr-3"></div>
                             <p class="font-medium text-gray-800 dark:text-gray-200">${a.name + ' ' + a.last_name}</p>
                         </div>
-                        <span class="px-2 py-1 rounded text-xs font-semibold ${colorClass}">${a.time}</span>
+                        <span class="px-2 py-1 rounded text-xs font-semibold ${colors.badge}">${a.time}</span>
                     </div>
                 `;
             }).join('');
@@ -134,7 +138,7 @@
 
             names.forEach(p => {
                 if (p.textContent.toLowerCase().trim().includes(searchTerm)) {
-                    hasMatch = true;
+           hasMatch = true;
                 }
             });
 
