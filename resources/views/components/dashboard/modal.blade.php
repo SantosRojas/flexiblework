@@ -6,7 +6,8 @@
     'linkHref' => '#',
     'linkText' => 'Ver más →',
     'linkId' => null,
-    'linkColor' => 'blue'
+    'linkColor' => 'blue',
+    'showLink' => true
 ])
 
 @php
@@ -30,7 +31,7 @@
         <div id="{{ $contentId }}" class="space-y-3 max-h-80 overflow-y-auto">
             {{-- Contenido dinámico --}}
         </div>
-        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700 {{ $showLink ? '' : 'hidden' }}">
             <a @if($linkId) id="{{ $linkId }}" @endif href="{{ $linkHref }}" class="text-sm {{ $linkColors[$linkColor] ?? $linkColors['blue'] }}">
                 {{ $linkText }}
             </a>

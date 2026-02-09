@@ -79,18 +79,14 @@ class DashboardController extends Controller
 
         // Datos adicionales para managers/admin
         $teamFlexibleCount = 0;
-        $flexibleAssignments = collect();
+
+        // Asignaciones de horario flexible del mes (visible para todos)
+        $flexibleAssignments = FlexibleScheduleAssignment::with('user')
+            ->forMonth($currentMonth, $currentYear)
+            ->orderBy('start_time')
+            ->get();
 
         if ($user->canManageAssignments()) {
-            // Asignaciones de horario flexible del mes
-            $flexibleAssignments = FlexibleScheduleAssignment::with('user')
-                ->forMonth($currentMonth, $currentYear)
-                ->when(!$user->isAdmin(), function ($query) use ($user) {
-                    $query->whereHas('user', fn($q) => $q->where('work_area', $user->work_area));
-                })
-                ->orderBy('start_time')
-                ->get();
-
             $teamFlexibleCount = $flexibleAssignments->count();
         }
 
@@ -110,17 +106,14 @@ class DashboardController extends Controller
             })->values();
         });
 
-        // Datos para JavaScript - Horarios Flexibles agrupados por área
-        $flexibleByArea = [];
-        if ($user->canManageAssignments()) {
-            $flexibleByArea = $flexibleAssignments->groupBy(function($a) {
-                return $a->user->work_area;
-            })->map(function($items) {
-                return $items->map(function($a) {
-                    return ['name' => $a->user->name,'last_name' => $a->user->last_name, 'time' => substr($a->start_time, 0, 5)];
-                })->sortBy('time')->values();
-            });
-        }
+        // Datos para JavaScript - Horarios Flexibles agrupados por área (visible para todos)
+        $flexibleByArea = $flexibleAssignments->groupBy(function($a) {
+            return $a->user->work_area;
+        })->map(function($items) {
+            return $items->map(function($a) {
+                return ['name' => $a->user->name,'last_name' => $a->user->last_name, 'time' => substr($a->start_time, 0, 5)];
+            })->sortBy('time')->values();
+        });
 
         return view('dashboard', compact(
             'user',

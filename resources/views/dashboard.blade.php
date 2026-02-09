@@ -14,34 +14,16 @@
 
             {{-- Resumen personal --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <x-dashboard.stat-card
-                    icon="home"
-                    iconBg="blue"
-                    label="Mis días Home Office"
-                    :value="$myHomeOfficeDays . ' / ' . $maxHomeOfficeDays"
-                />
+                <x-dashboard.stat-card icon="home" iconBg="blue" label="Mis días Home Office" :value="$myHomeOfficeDays . ' / ' . $maxHomeOfficeDays" />
 
-                <x-dashboard.stat-card
-                    icon="clock"
-                    iconBg="green"
-                    label="Mi horario"
-                    :value="$myFlexibleSchedule ? substr($myFlexibleSchedule->start_time, 0, 5) : '08:00'"
-                />
+                <x-dashboard.stat-card icon="clock" iconBg="green" label="Mi horario" :value="$myFlexibleSchedule ? substr($myFlexibleSchedule->start_time, 0, 5) : '08:00'" />
 
                 @if($user->canManageAssignments())
-                    <x-dashboard.stat-card
-                        icon="users"
-                        iconBg="purple"
-                        label="Home Office hoy"
-                        :value="$teamHomeOfficeToday->count()"
-                    />
+                    <x-dashboard.stat-card icon="users" iconBg="purple" label="Home Office hoy"
+                        :value="$teamHomeOfficeToday->count()" />
 
-                    <x-dashboard.stat-card
-                        icon="clipboard"
-                        iconBg="orange"
-                        label="Horarios flexibles"
-                        :value="$teamFlexibleCount"
-                    />
+                    <x-dashboard.stat-card icon="clipboard" iconBg="orange" label="Horarios flexibles"
+                        :value="$teamFlexibleCount" />
                 @else
                     {{-- Para usuarios normales, próximo home office --}}
                     <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-4 col-span-2">
@@ -70,51 +52,27 @@
             </div>
 
             {{-- Calendario de Home Office (visible para todos) --}}
-            <x-dashboard.home-office-calendar
-                :user="$user"
-                :currentYear="$currentYear"
-                :currentMonth="$currentMonth"
-                :homeOfficeAssignments="$homeOfficeAssignments"
-            />
+            <x-dashboard.home-office-calendar :user="$user" :currentYear="$currentYear" :currentMonth="$currentMonth"
+                :homeOfficeAssignments="$homeOfficeAssignments" />
 
-            {{-- Horarios Flexibles del mes (solo managers/admin) --}}
-            @if($user->canManageAssignments())
-                <x-dashboard.flexible-schedule-grid
-                    :currentYear="$currentYear"
-                    :currentMonth="$currentMonth"
-                    :flexibleAssignments="$flexibleAssignments"
-                />
-            @endif
+            {{-- Horarios Flexibles del mes (visible para todos) --}}
+            <x-dashboard.flexible-schedule-grid :currentYear="$currentYear" :currentMonth="$currentMonth"
+                :flexibleAssignments="$flexibleAssignments" />
 
         </div>
     </div>
 
     {{-- Modal para Home Office --}}
-    <x-dashboard.modal
-        id="dayModal"
-        titleId="modalTitle"
-        contentId="modalContent"
-        closeFunction="closeDayModal"
-        linkId="modalLink"
-        linkText="Ver todas las asignaciones →"
-        linkColor="blue"
-    />
+    <x-dashboard.modal id="dayModal" titleId="modalTitle" contentId="modalContent" closeFunction="closeDayModal"
+        linkId="modalLink" linkText="Ver todas las asignaciones →" linkColor="blue"
+        :showLink="$user->canManageAssignments()" />
 
     {{-- Modal para Horarios Flexibles --}}
-    <x-dashboard.modal
-        id="flexibleModal"
-        titleId="flexibleModalTitle"
-        contentId="flexibleModalContent"
-        closeFunction="closeFlexibleModal"
-        :linkHref="route('flexible-schedule.index')"
-        linkText="Gestionar horarios flexibles →"
-        linkColor="green"
-    />
+    <x-dashboard.modal id="flexibleModal" titleId="flexibleModalTitle" contentId="flexibleModalContent"
+        closeFunction="closeFlexibleModal" :linkHref="route('flexible-schedule.index')"
+        linkText="Gestionar horarios flexibles →" linkColor="green" :showLink="$user->canManageAssignments()" />
 
     {{-- Scripts --}}
-    <x-dashboard.scripts
-        :homeOfficeByDate="$homeOfficeByDate"
-        :flexibleByArea="$flexibleByArea"
-    />
+    <x-dashboard.scripts :homeOfficeByDate="$homeOfficeByDate" :flexibleByArea="$flexibleByArea" />
 
 </x-app-layout>
