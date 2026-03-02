@@ -56,6 +56,10 @@ Route::middleware('auth')->group(function () {
         // Configuración del sistema
         Route::get('/admin/settings', [SystemSettingController::class, 'index'])->name('admin.settings');
         Route::put('/admin/settings', [SystemSettingController::class, 'update'])->name('admin.settings.update');
+        
+        // Extensión del período de planificación
+        Route::post('/admin/settings/extend-period', [SystemSettingController::class, 'extendPeriod'])->name('admin.settings.extend-period');
+        Route::delete('/admin/settings/revoke-extension', [SystemSettingController::class, 'revokeExtension'])->name('admin.settings.revoke-extension');
 
         // Gestión de Usuarios
         Route::get('/admin/users', [UserManagementController::class, 'index'])->name('admin.users.index');

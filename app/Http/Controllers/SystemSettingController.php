@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\SystemSetting;
+use App\Services\PlanningPeriodService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class SystemSettingController extends Controller
 {
@@ -30,8 +32,31 @@ class SystemSettingController extends Controller
         
         // Obtener historial de cambios
         $allSettings = SystemSetting::with('updatedBy')->get();
+
+        // Obtener información de extensión activa
+        $extensionInfo = PlanningPeriodService::getCurrentExtensionInfo();
+
+        // Calcular mes/año actuales para el formulario de extensión
+        $now = Carbon::now();
+        $currentMonth = $now->month;
+        $currentYear = $now->year;
+        $nextMonthObj = $now->copy()->addMonth();
+
+        // Meses disponibles para extender (mes actual y próximo)
+        $availableMonthsForExtension = [
+            [
+                'month' => $currentMonth,
+                'year' => $currentYear,
+                'label' => ucfirst(Carbon::create($currentYear, $currentMonth, 1)->locale('es')->monthName) . ' ' . $currentYear,
+            ],
+            [
+                'month' => $nextMonthObj->month,
+                'year' => $nextMonthObj->year,
+                'label' => ucfirst(Carbon::create($nextMonthObj->year, $nextMonthObj->month, 1)->locale('es')->monthName) . ' ' . $nextMonthObj->year,
+            ],
+        ];
         
-        return view('admin.settings', compact('settings', 'allSettings'));
+        return view('admin.settings', compact('settings', 'allSettings', 'extensionInfo', 'availableMonthsForExtension'));
     }
 
     /**
@@ -78,5 +103,55 @@ class SystemSettingController extends Controller
         SystemSetting::set('january_planning_end_day', $request->january_planning_end_day, $user->id);
         
         return back()->with('success', 'Configuración actualizada correctamente.');
+    }
+
+    /**
+     * Extender el período de planificación para un mes específico
+     */
+    public function extendPeriod(Request $request)
+    {
+        $user = Auth::user();
+        
+        if (!$user->isAdmin()) {
+            abort(403, 'No tienes permisos para realizar esta acción.');
+        }
+        
+        $request->validate([
+            'extension_days' => 'required|integer|min:1|max:15',
+            'extension_month' => 'required|integer|min:1|max:12',
+            'extension_year' => 'required|integer|min:2020|max:2099',
+        ], [
+            'extension_days.required' => 'El número de días es requerido.',
+            'extension_days.min' => 'Debe ser al menos 1 día.',
+            'extension_days.max' => 'El máximo es 15 días.',
+            'extension_month.required' => 'El mes es requerido.',
+            'extension_year.required' => 'El año es requerido.',
+        ]);
+        
+        $month = (int) $request->extension_month;
+        $year = (int) $request->extension_year;
+        $days = (int) $request->extension_days;
+        
+        $result = PlanningPeriodService::extendPeriod($month, $year, $days, $user->id);
+        
+        $monthName = ucfirst(Carbon::create($year, $month, 1)->locale('es')->monthName);
+        
+        return back()->with('success', "✅ Período de asignación para {$monthName} {$year} reabierto por {$days} día(s). Activo hasta el {$result['deadline']->format('d/m/Y')}.");
+    }
+
+    /**
+     * Revocar/cancelar la extensión del período de planificación
+     */
+    public function revokeExtension()
+    {
+        $user = Auth::user();
+        
+        if (!$user->isAdmin()) {
+            abort(403, 'No tienes permisos para realizar esta acción.');
+        }
+        
+        PlanningPeriodService::revokeExtension($user->id);
+        
+        return back()->with('success', '⛔ Extensión del período de asignación cancelada correctamente.');
     }
 }
