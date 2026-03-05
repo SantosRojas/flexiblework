@@ -9,6 +9,7 @@ use App\Services\PlanningPeriodService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class HomeOfficeController extends Controller
 {
@@ -413,7 +414,7 @@ class HomeOfficeController extends Controller
                     $assignment->user->work_area ?? 'Sin área',
                     $assignment->date->format('d/m/Y'),
                     $assignment->date->locale('es')->dayName,
-                    $assignment->assignedBy->name ?? 'Sistema',
+                    $assignment->assignedBy ? Str::before($assignment->assignedBy->name, ' ') . ' ' . Str::before($assignment->assignedBy->last_name, ' ') : 'Sistema',
                     $assignment->created_at->format('d/m/Y H:i')
                 ], ';');
             }

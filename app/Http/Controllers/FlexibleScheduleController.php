@@ -8,6 +8,7 @@ use App\Services\PlanningPeriodService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class FlexibleScheduleController extends Controller
 {
@@ -371,7 +372,7 @@ class FlexibleScheduleController extends Controller
                     substr($assignment->start_time, 0, 5),
                     $assignment->lunch_start_time ? substr($assignment->lunch_start_time, 0, 5) : '12:00',
                     $endTime->format('H:i'),
-                    $assignment->assignedBy->name ?? 'Sistema',
+                    $assignment->assignedBy ? Str::before($assignment->assignedBy->name, ' ') . ' ' . Str::before($assignment->assignedBy->last_name, ' ') : 'Sistema',
                     $assignment->created_at->format('d/m/Y H:i')
                 ], ';');
             }

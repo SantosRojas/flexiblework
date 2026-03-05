@@ -172,7 +172,7 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                {{ $assignment->assignedBy->name ?? 'Sistema' }}
+                                                {{ $assignment->assignedBy ? Str::before($assignment->assignedBy->name, ' ') . ' ' . Str::before($assignment->assignedBy->last_name, ' ') : 'Sistema' }}
                                             </td>
                                         </tr>
                                     @endforeach
