@@ -105,6 +105,9 @@
                                         Empleado
                                     </th>
                                     <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        DNI
+                                    </th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                         Área
                                     </th>
                                     <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -134,6 +137,11 @@
                                         <td class="px-4 py-3 whitespace-nowrap">
                                             <span class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                 {{ $member->name }} {{ $member->last_name }}
+                                            </span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap">
+                                            <span class="text-sm text-gray-500 dark:text-gray-400">
+                                                {{ $member->dni ?? '-' }}
                                             </span>
                                         </td>
                                         <td class="px-4 py-3 whitespace-nowrap">

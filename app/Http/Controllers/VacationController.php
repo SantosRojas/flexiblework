@@ -319,7 +319,7 @@ class VacationController extends Controller
         
         // Preparar datos para CSV
         $csvData = [];
-        $csvData[] = ['Empleado', 'Área', 'Días Totales', 'Días Usados', 'Días Disponibles', 'Períodos'];
+        $csvData[] = ['Empleado', 'DNI', 'Área', 'Días Totales', 'Días Usados', 'Días Disponibles', 'Períodos'];
         
         foreach ($teamMembers as $member) {
             $summary = VacationAssignment::getVacationSummary($member->id, $year);
@@ -330,6 +330,7 @@ class VacationController extends Controller
             
             $csvData[] = [
                 $member->name . ' ' . $member->last_name,
+                $member->dni ?? '',
                 $member->work_area,
                 $summary['total_days'],
                 $summary['used_days'],
