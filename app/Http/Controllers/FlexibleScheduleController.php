@@ -366,7 +366,7 @@ class FlexibleScheduleController extends Controller
                 
                 fputcsv($file, [
                     $assignment->user->name . ' ' . ($assignment->user->last_name ?? ''),
-                    $assignment->user->dni ?? '',
+                    $assignment->user->dni ? '="' . $assignment->user->dni . '"' : '',
                     $assignment->user->email,
                     $assignment->user->work_area ?? 'Sin área',
                     substr($assignment->start_time, 0, 5),

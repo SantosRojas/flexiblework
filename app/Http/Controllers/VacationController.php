@@ -330,7 +330,7 @@ class VacationController extends Controller
             
             $csvData[] = [
                 $member->name . ' ' . $member->last_name,
-                $member->dni ?? '',
+                $member->dni ? '="' . $member->dni . '"' : '',
                 $member->work_area,
                 $summary['total_days'],
                 $summary['used_days'],

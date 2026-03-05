@@ -410,7 +410,7 @@ class HomeOfficeController extends Controller
             foreach ($assignments as $assignment) {
                 fputcsv($file, [
                     $assignment->user->name . ' ' . ($assignment->user->last_name ?? ''),
-                    $assignment->user->dni ?? '',
+                    $assignment->user->dni ? '="' . $assignment->user->dni . '"' : '',
                     $assignment->user->work_area ?? 'Sin área',
                     $assignment->date->format('d/m/Y'),
                     $assignment->date->locale('es')->dayName,
